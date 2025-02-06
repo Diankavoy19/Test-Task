@@ -48,6 +48,8 @@ jobs:
         run: |
           cd my-vite-app 
           npm run start &
+      - name: Install wait-on globally
+        run: npm install -g wait-on
 
       - name: Wait for React app to be ready
         run: |

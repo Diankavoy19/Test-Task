@@ -81,22 +81,23 @@ jobs:
           npm run test
         continue-on-error: true # Continue execution even if tests fail 
       
-      # If Playwright tests fail, this step will exit with a non-zero status
-      - name: Set GitHub Status Check
+      - name: Set GitHub Status Check (on failure)
+        if: failure()  # This step runs if previous steps failed
         run: |
-          if [ $? -eq 0 ]; then
-            echo "Tests passed"
-            curl -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -d '{"state":"success", "context":"Playwright Tests", "description":"All tests passed"}' \
-              "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
-          else
-            echo "Tests failed"
-            curl -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -d '{"state":"failure", "context":"Playwright Tests", "description":"Some tests failed"}' \
-              "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
-          fi
+          echo "Tests failed, setting GitHub status to failure"
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"state":"failure", "context":"Playwright Tests", "description":"Some tests failed"}' \
+            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
+
+      - name: Set GitHub Status Check (on success)
+        if: success()  # This step runs if previous steps succeeded
+        run: |
+          echo "Tests passed, setting GitHub status to success"
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"state":"success", "context":"Playwright Tests", "description":"All tests passed"}' \
+            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
 
       # Cache test results for debugging failed tests
       - name: Cache test results

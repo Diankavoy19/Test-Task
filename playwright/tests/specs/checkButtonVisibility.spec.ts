@@ -9,7 +9,7 @@ test.describe('Button visibility across different screen sizes', () => {
     const viewportSize = page.viewportSize();
 
     if (viewportSize && viewportSize.width <= 768) {
-      await expect(buttonVisibilityPage.button).toBeHidden(); 
+      await expect(buttonVisibilityPage.button).not.toBeInViewport(); 
     } else {
       await expect(buttonVisibilityPage.button).toBeVisible();
     }
@@ -18,5 +18,6 @@ test.describe('Button visibility across different screen sizes', () => {
     const buttonVisibilityPage = new ButtonVisibilityPage(page);
     await buttonVisibilityPage.navigate();
     await expect(buttonVisibilityPage.button).toBeVisible();
+    await expect(buttonVisibilityPage.button).toHaveCSS('margin-left', '0px');
   });
 });

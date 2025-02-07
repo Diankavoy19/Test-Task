@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main  
+  workflow_dispatch:
 
 jobs:
   test:
@@ -21,6 +22,7 @@ jobs:
         with:
           node-version: '18' 
 
+      # Cache `node_modules` to speed up dependency installation
       - name: Cache node_modules
         uses: actions/cache@v3
         with:
@@ -30,12 +32,14 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
+      # If `package-lock.json` hasn't changed, cached dependencies will be reused
 
       - name: Install dependencies
         run: |
           cd my-vite-app && npm install
           cd ../playwright && npm install
 
+      # Cache Playwright browsers to avoid re-downloading them every run
       - name: Cache Playwright browsers
         uses: actions/cache@v3
         continue-on-error: true
@@ -44,16 +48,19 @@ jobs:
           key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('playwright/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-browsers-
+      # If Playwright browsers are already cached, they won’t be downloaded again 
           
       - name: Install Playwright Browsers
         run: |
           cd playwright
           npx playwright install --with-deps
 
+      # Kill any processes using port 5173 to prevent conflicts
       - name: Kill any process using port 5173
         run: |
           sudo lsof -t -i:5173 | xargs sudo kill -9 || true
 
+      # Start Vite React app in the background
       - name: Run React app
         run: |
           cd my-vite-app
@@ -66,8 +73,9 @@ jobs:
         run: |
           cd playwright
           npm run test
-        continue-on-error: true 
+        continue-on-error: true # Continue execution even if tests fail 
 
+      # Cache test results for debugging failed tests
       - name: Cache test results
         uses: actions/cache@v3
         with:
@@ -75,7 +83,9 @@ jobs:
           key: ${{ runner.os }}-test-results-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-test-results-
+      # If tests fail, results are cached and can be reviewed later 
 
+      # Upload test results as an artifact for debugging in GitHub Actions
       - name: Upload test results
         if: always() 
         uses: actions/upload-artifact@v4

@@ -48,13 +48,11 @@ jobs:
       # Cache Playwright browsers to avoid re-downloading them every run
       - name: Cache Playwright browsers
         uses: actions/cache@v3
-        continue-on-error: true
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('playwright/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-browsers-
-      # If Playwright browsers are already cached, they won’t be downloaded again 
           
       - name: Install Playwright Browsers
         run: |

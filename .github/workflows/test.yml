@@ -82,6 +82,10 @@ jobs:
           npx playwright test --reporter=json --output=playwright/test-results
         continue-on-error: true # Continue execution even if tests fail 
       
+      - name: Check contents of the test results directory
+        run: |
+          echo "Contents of playwright/test-results:"
+          ls -l playwright/test-results
       - name: Check if tests failed
         id: check_test_result
         run: |

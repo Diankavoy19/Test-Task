@@ -88,7 +88,7 @@ jobs:
           echo "Playwright test result:"
           if [ -f playwright/test-results/result.json ]; then
             cat playwright/test-results/result.json
-            failed_tests=$(jq '[.tests[] | select(.status == "failed")] | length' playwright/test-results/result.json)
+            failed_tests=$(jq '[.suites[].suites[].specs[].tests[] | select(.results[].status != "passed")] | length' playwright/test-results/result.json)
             if [ "$failed_tests" -gt 0 ]; then
               echo "Some tests failed"
               echo "failed=true" >> $GITHUB_ENV

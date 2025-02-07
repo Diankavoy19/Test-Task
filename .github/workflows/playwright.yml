@@ -68,6 +68,14 @@ jobs:
           npm run test
         continue-on-error: true 
 
+      - name: Cache test results
+        uses: actions/cache@v3
+        with:
+          path: playwright/test-results
+          key: ${{ runner.os }}-test-results-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-test-results-
+
       - name: Upload test results
         if: always() 
         uses: actions/upload-artifact@v4

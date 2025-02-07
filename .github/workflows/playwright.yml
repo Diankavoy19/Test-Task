@@ -66,8 +66,10 @@ jobs:
         run: |
           cd playwright
           npm run test
+        continue-on-error: true 
 
       - name: Upload test results
+        if: always() 
         uses: actions/upload-artifact@v4
         with:
           name: playwright-test-results

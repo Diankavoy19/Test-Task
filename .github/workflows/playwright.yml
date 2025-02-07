@@ -38,6 +38,7 @@ jobs:
 
       - name: Cache Playwright browsers
         uses: actions/cache@v3
+        continue-on-error: true
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('playwright/package-lock.json') }}
@@ -52,14 +53,10 @@ jobs:
       - name: Run React app
         run: |
           cd my-vite-app
-          nohup npm run dev > dev.log 2>&1 &
-
-      - name: Install wait-on globally
-        run: npm install -g wait-on
+          npm run dev & npx wait-on http://localhost:5173 --timeout 60000
 
       - name: Wait for React app to be ready
-        run: |
-          npx wait-on http://localhost:5173 --timeout 60000 
+        run: npx wait-on http://localhost:5173 --timeout 60000
 
       - name: Run Playwright tests
         run: |

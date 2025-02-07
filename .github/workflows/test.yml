@@ -45,25 +45,20 @@ jobs:
           cd my-vite-app && npm install
           cd ../playwright && npm install
 
-      - name: Install missing libraries
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwoff2-dev libwoff2dec0
-
       # Cache Playwright browsers to avoid re-downloading them every run
       - name: Cache Playwright Browsers
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-browsers-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            playwright-browsers-
+            ${{ runner.os }}-playwright-browsers-
         
-      - name: Install Playwright Browsers (only if not cached)
+      - name: Install Playwright Browsers
         run: |
-          if [ ! -d ~/.cache/ms-playwright ]; then
+            if [ ! -d ~/.cache/ms-playwright ]; then
             npx playwright install
-          fi
+            fi
 
       # Kill any processes using port 5173 to prevent conflicts
       - name: Kill any process using port 5173

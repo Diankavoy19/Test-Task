@@ -54,10 +54,11 @@ jobs:
           restore-keys: |
             playwright-browsers-
           
-      - name: Install Playwright Browsers
-        run: |
-          cd playwright
-          npx playwright install --with-deps
+              - name: Install Playwright Browsers (only if not cached)
+              run: |
+                if [ ! -d ~/.cache/ms-playwright ]; then
+                  npx playwright install
+                fi      
 
       # Kill any processes using port 5173 to prevent conflicts
       - name: Kill any process using port 5173

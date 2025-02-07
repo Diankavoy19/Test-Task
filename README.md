@@ -62,7 +62,7 @@ Tests are automatically executed in **GitHub Actions CI** on every push or pull 
 
 OR
 
-Go to the [GitHub Actions](https://github.com/Diankavoy19/Test-Task/actions).
+1. Go to the [GitHub Actions](https://github.com/Diankavoy19/Test-Task/actions).
 2. Click on the workflow ["Playwright Tests"](https://github.com/Diankavoy19/Test-Task/actions/workflows/test.yml).
 3. Click on the "Run workflow" button
 4. Click on the "Run workflow" button again

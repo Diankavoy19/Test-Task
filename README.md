@@ -51,7 +51,7 @@ After running tests, Playwright generates a test report. To open it:
 ```sh
 npx playwright show-report
 ```
-## 🏧 Running Tests in CI  
+## Running Tests in CI  
 
 Tests are automatically executed in **GitHub Actions CI** on every push or pull request. The workflow:  
 

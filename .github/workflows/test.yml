@@ -1,12 +1,6 @@
 name: Playwright Tests
 
 on:
-  push:
-    branches:
-      - main  
-  pull_request:
-    branches:
-      - main  
   workflow_dispatch:
     inputs:
       margin_issue:
@@ -104,3 +98,9 @@ jobs:
         with:
           name: playwright-test-results
           path: playwright/test-results
+      - name: Set failure status if tests failed
+        run: |
+          if grep -q "Test failed" playwright/test-results/test-results.json; then
+            echo "Tests failed"
+            exit 1
+          fi

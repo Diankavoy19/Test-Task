@@ -22,6 +22,8 @@ Before running the tests, make sure you have the following installed:
    ```sh
    npx playwright install --with-deps
    ```
+4. Create .env file with 'VITE_MARGIN_ISSUE=false'(if you want to check without issue) or 'VITE_MARGIN_ISSUE=true' (if you want to check with issue)
+
 ## Running the Application  
 
 To start the React application locally:  
@@ -52,19 +54,10 @@ After running tests, Playwright generates a test report. To open it:
 npx playwright show-report
 ```
 ## Running Tests in CI  
-
-Tests are automatically executed in **GitHub Actions CI** on every push or pull request. The workflow:  
-
-- Installs dependencies  
-- Starts the React app  
-- Runs Playwright tests  
-- Uploads test results for debugging  
-
-OR
-
 1. Go to the [GitHub Actions](https://github.com/Diankavoy19/Test-Task/actions).
 2. Click on the workflow ["Playwright Tests"](https://github.com/Diankavoy19/Test-Task/actions/workflows/test.yml).
 3. Click on the "Run workflow" button
+4. Select "true" or "false" from the dropdown below the "Set margin issue to true or false"
 4. Click on the "Run workflow" button again
 5. Wait for the tests to run
 6. Click on the last test run

@@ -82,11 +82,20 @@ jobs:
         continue-on-error: true # Continue execution even if tests fail 
       
       # If Playwright tests fail, this step will exit with a non-zero status
-      - name: Set failure status if tests failed
+      - name: Set GitHub Status Check
         run: |
-          if [ $? -ne 0 ]; then
+          if [ $? -eq 0 ]; then
+            echo "Tests passed"
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -d '{"state":"success", "context":"Playwright Tests", "description":"All tests passed"}' \
+              "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
+          else
             echo "Tests failed"
-            exit 1
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -d '{"state":"failure", "context":"Playwright Tests", "description":"Some tests failed"}' \
+              "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
           fi
 
       # Cache test results for debugging failed tests

@@ -25,29 +25,35 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ~/.npm
-            node_modules
+            my-vite-app/node_modules
+            playwright/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
-      - name: Install test dependencies
+      - name: Install dependencies
         run: |
-          cd playwright
-          npm install
+          cd my-vite-app && npm install
+          cd ../playwright && npm install
 
       - name: Cache Playwright browsers
         uses: actions/cache@v3
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('playwright/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-browsers-
+          
+      - name: Install Playwright Browsers
+        run: |
+          cd playwright
+          npx playwright install --with-deps
 
       - name: Run React app
         run: |
-          cd my-vite-app 
+          cd my-vite-app
           nohup npm run dev > dev.log 2>&1 &
+
       - name: Install wait-on globally
         run: npm install -g wait-on
 
@@ -56,10 +62,12 @@ jobs:
           npx wait-on http://localhost:5173 --timeout 60000 
 
       - name: Run Playwright tests
-        run: npm run test
+        run: |
+          cd playwright
+          npm run test
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
           name: playwright-test-results
-          path: ./playwright/test-results
+          path: playwright/test-results

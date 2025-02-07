@@ -47,7 +47,7 @@ jobs:
       - name: Run React app
         run: |
           cd my-vite-app 
-          npm run start &
+          npm run dev &
       - name: Install wait-on globally
         run: npm install -g wait-on
 

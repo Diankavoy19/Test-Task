@@ -50,6 +50,10 @@ jobs:
           cd playwright
           npx playwright install --with-deps
 
+      - name: Kill any process using port 5173
+        run: |
+          sudo lsof -t -i:5173 | xargs sudo kill -9 || true
+
       - name: Run React app
         run: |
           cd my-vite-app

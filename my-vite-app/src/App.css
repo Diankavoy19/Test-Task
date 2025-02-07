@@ -17,20 +17,8 @@
   cursor: pointer;
 }
 
-.visible-on-mobile {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: blue;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
 @media (max-width: 768px) {
   .hidden-on-mobile {
-      margin-left: 5000px; 
-  }
-  .visible-on-mobile {
-    margin-left: 0px;
+    margin-left: var(--margin-left, 0px); /* Default: no issue */
   }
 }

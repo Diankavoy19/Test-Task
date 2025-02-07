@@ -8,10 +8,22 @@ on:
     branches:
       - main  
   workflow_dispatch:
+    inputs:
+      margin_issue:
+        description: 'Set margin issue to true or false'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    env:
+      VITE_MARGIN_ISSUE: ${{ github.event.inputs.margin_issue }}  # use input for changing value
 
     steps:
       - name: Checkout code

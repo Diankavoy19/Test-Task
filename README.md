@@ -59,5 +59,6 @@ npx playwright show-report
 3. Click on the "Run workflow" button
 4. Select "true" or "false" from the dropdown below the "Set margin issue to true or false"
 4. Click on the "Run workflow" button again
-5. Wait for the tests to run
-6. Click on the last test run
+5. Reload the page
+6. Wait for the tests to run
+7. Click on the last test run

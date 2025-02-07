@@ -22,7 +22,7 @@ Before running the tests, make sure you have the following installed:
    ```sh
    npx playwright install --with-deps
    ```
-4. Create .env file with 'VITE_MARGIN_ISSUE=false'(if you want to check without issue) or 'VITE_MARGIN_ISSUE=true' (if you want to check with issue)
+4. Create .env file in the 'my-vite-app' folder with 'VITE_MARGIN_ISSUE=false'(if you want to check without issue) or 'VITE_MARGIN_ISSUE=true' (if you want to check with issue)
 
 ## Running the Application  
 

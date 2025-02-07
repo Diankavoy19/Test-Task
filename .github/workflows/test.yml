@@ -76,58 +76,13 @@ jobs:
         run: npx wait-on http://localhost:5173 --timeout 60000
 
       - name: Run Playwright tests
-        id: playwright_tests
         run: |
           cd playwright
-          npx playwright test --reporter=json --output=playwright/test-results
-        continue-on-error: true # Continue execution even if tests fail 
-      
-      - name: Check contents of the test results directory
-        run: |
-          echo "Contents of playwright/test-results:"
-          ls -l playwright/test-results
-      - name: Check if tests failed
-        id: check_test_result
-        run: |
-          echo "Playwright test result:"
-          if [ -f playwright/test-results/result.json ]; then
-            cat playwright/test-results/result.json
-            failed_tests=$(jq '[.suites[].suites[].specs[].tests[] | select(.results[].status != "passed")] | length' playwright/test-results/result.json)
-            if [ "$failed_tests" -gt 0 ]; then
-              echo "Some tests failed"
-              echo "failed=true" >> $GITHUB_ENV
-            else
-              echo "All tests passed"
-              echo "failed=false" >> $GITHUB_ENV
-            fi
-          else
-            echo "Result file not found"
-            exit 1
-          fi
-
-      # Set GitHub status to failure if any tests failed
-      - name: Set GitHub status to failure
-        if: ${{ env.failed == 'true' }}  # Check the failure status from environment variable
-        run: |
-          echo "Tests failed, setting GitHub status to failure"
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d '{"state":"failure", "context":"Playwright Tests", "description":"Some tests failed"}' \
-            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
-
-      # Set GitHub status to success if all tests passed
-      - name: Set GitHub status to success
-        if: ${{ env.failed == 'false' }}  # Check the success status from environment variable
-        run: |
-          echo "Tests passed, setting GitHub status to success"
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d '{"state":"success", "context":"Playwright Tests", "description":"All tests passed"}' \
-            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
-
+          npx playwright test 
 
       # Cache test results for debugging failed tests
       - name: Cache test results
+        if: always() 
         uses: actions/cache@v3
         with:
           path: playwright/test-results

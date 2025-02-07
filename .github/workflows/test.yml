@@ -81,23 +81,35 @@ jobs:
           npm run test
         continue-on-error: true # Continue execution even if tests fail 
       
-      # Debugging: print the outcome of the playwright tests step
-      - name: Debug - Check Playwright test outcome
+      - name: Check Playwright test result
+        id: test_result
         run: |
-          echo "Playwright test outcome: ${{ steps.playwright_tests.outcome }}"
-        # This will print the outcome of the previous step to help with debugging
+          if grep -q "Playwright tests failed" result.txt; then
+            echo "Tests failed" 
+            echo "failed=true" >> $GITHUB_ENV
+          else
+            echo "Tests passed"
+            echo "failed=false" >> $GITHUB_ENV
+          fi
 
-      # Check the status of tests and set GitHub status based on the test outcome
-      - name: Set GitHub status based on test results
-        if: ${{ steps.playwright_tests.outcome == 'failure' }}  # Correct access to step context
+      # Set GitHub status based on test results
+      - name: Set GitHub status to failure
+        if: ${{ env.failed == 'true' }}  # Check the failure status from environment variable
         run: |
           echo "Tests failed, setting GitHub status to failure"
-          exit 1  # This will mark the workflow as failed
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"state":"failure", "context":"Playwright Tests", "description":"Some tests failed"}' \
+            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
 
-      - name: Set GitHub status on success
-        if: ${{ steps.playwright_tests.outcome == 'success' }}  # Correct access to step context
+      - name: Set GitHub status to success
+        if: ${{ env.failed == 'false' }}  # Check the success status from environment variable
         run: |
           echo "Tests passed, setting GitHub status to success"
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"state":"success", "context":"Playwright Tests", "description":"All tests passed"}' \
+            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
 
       # Cache test results for debugging failed tests
       - name: Cache test results

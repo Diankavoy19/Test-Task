@@ -46,14 +46,18 @@ jobs:
           cd ../playwright && npm install
 
       # Cache Playwright browsers to avoid re-downloading them every run
-      - name: Cache Playwright browsers
+      - name: Cache Playwright Browsers
         uses: actions/cache@v3
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('playwright/package-lock.json') }}
+          key: playwright-browsers-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-playwright-browsers-
+            playwright-browsers-
           
+      - name: Install Playwright Browsers
+        run: |
+          cd playwright
+          npx playwright install --with-deps
 
       # Kill any processes using port 5173 to prevent conflicts
       - name: Kill any process using port 5173

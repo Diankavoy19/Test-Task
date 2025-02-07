@@ -79,21 +79,26 @@ jobs:
         id: playwright_tests
         run: |
           cd playwright
-          npx playwright test --reporter=json --output=playwright/test-results > result.json
+          npx playwright test --reporter=json --output=playwright/test-results
         continue-on-error: true # Continue execution even if tests fail 
       
       - name: Check if tests failed
         id: check_test_result
         run: |
           echo "Playwright test result:"
-          cat playwright/test-results/result.json  # Правильний шлях до файлу
-          failed_tests=$(jq '[.tests[] | select(.status == "failed")] | length' playwright/test-results/result.json)
-          if [ "$failed_tests" -gt 0 ]; then
-            echo "Some tests failed"
-            echo "failed=true" >> $GITHUB_ENV
+          if [ -f playwright/test-results/result.json ]; then
+            cat playwright/test-results/result.json
+            failed_tests=$(jq '[.tests[] | select(.status == "failed")] | length' playwright/test-results/result.json)
+            if [ "$failed_tests" -gt 0 ]; then
+              echo "Some tests failed"
+              echo "failed=true" >> $GITHUB_ENV
+            else
+              echo "All tests passed"
+              echo "failed=false" >> $GITHUB_ENV
+            fi
           else
-            echo "All tests passed"
-            echo "failed=false" >> $GITHUB_ENV
+            echo "Result file not found"
+            exit 1
           fi
 
       # Set GitHub status to failure if any tests failed

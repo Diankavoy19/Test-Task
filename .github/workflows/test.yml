@@ -81,7 +81,7 @@ jobs:
           npm run test
         continue-on-error: true # Continue execution even if tests fail 
       
-        #Check if any test failed and set GitHub Status accordingly
+      # Check if any test failed and set GitHub Status accordingly
       - name: Set GitHub Status Check (on failure)
         if: ${{ steps.playwright_tests.outcome == 'failure' }}  # If any test failed
         run: |
@@ -90,7 +90,7 @@ jobs:
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d '{"state":"failure", "context":"Playwright Tests", "description":"Some tests failed"}' \
             "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
-  
+
       - name: Set GitHub Status Check (on success)
         if: ${{ steps.playwright_tests.outcome == 'success' }}  # If all tests passed
         run: |

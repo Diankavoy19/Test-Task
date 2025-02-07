@@ -45,20 +45,21 @@ jobs:
           cd my-vite-app && npm install
           cd ../playwright && npm install
 
-      # Cache Playwright browsers to avoid re-downloading them every run
-      - name: Cache Playwright Browsers
-        uses: actions/cache@v2
+      ## Cache Playwright browsers to avoid re-downloading them every run
+      - name: Cache Playwright browsers
+        uses: actions/cache@v3
+        continue-on-error: true
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('playwright/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-browsers-
+      # If Playwright browsers are already cached, they won’t be downloaded again 
         
       - name: Install Playwright Browsers
         run: |
-            if [ ! -d ~/.cache/ms-playwright ]; then
-            npx playwright install
-            fi
+          cd playwright
+          npx playwright install --with-deps
 
       # Kill any processes using port 5173 to prevent conflicts
       - name: Kill any process using port 5173

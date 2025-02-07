@@ -84,17 +84,17 @@ jobs:
       - name: Check Playwright test result
         id: test_result
         run: |
-          if grep -q "Playwright tests failed" result.txt; then
-            echo "Tests failed" 
-            echo "failed=true" >> $GITHUB_ENV
-          else
+          if [ $? -eq 0 ]; then
             echo "Tests passed"
             echo "failed=false" >> $GITHUB_ENV
+          else
+            echo "Tests failed"
+            echo "failed=true" >> $GITHUB_ENV
           fi
 
-      # Set GitHub status based on test results
+      # Set GitHub status to failure
       - name: Set GitHub status to failure
-        if: ${{ env.failed == 'true' }}  # Check the failure status from environment variable
+        if: ${{ env.failed == 'true' }}  
         run: |
           echo "Tests failed, setting GitHub status to failure"
           curl -X POST \
@@ -102,14 +102,16 @@ jobs:
             -d '{"state":"failure", "context":"Playwright Tests", "description":"Some tests failed"}' \
             "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
 
+      # Set GitHub status to success
       - name: Set GitHub status to success
-        if: ${{ env.failed == 'false' }}  # Check the success status from environment variable
+        if: ${{ env.failed == 'false' }}  
         run: |
           echo "Tests passed, setting GitHub status to success"
           curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d '{"state":"success", "context":"Playwright Tests", "description":"All tests passed"}' \
             "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
+
 
       # Cache test results for debugging failed tests
       - name: Cache test results

@@ -76,25 +76,29 @@ jobs:
         run: npx wait-on http://localhost:5173 --timeout 60000
 
       - name: Run Playwright tests
+        id: playwright_tests
         run: |
           cd playwright
           npm run test
         continue-on-error: true # Continue execution even if tests fail 
       
-      - name: Check Playwright test result
-        id: test_result
+      - name: Check if tests failed
+        id: check_test_result
         run: |
-          if [ $? -eq 0 ]; then
-            echo "Tests passed"
-            echo "failed=false" >> $GITHUB_ENV
-          else
-            echo "Tests failed"
+          echo "Playwright test result:"
+          cat result.json
+          failed_tests=$(jq '[.tests[] | select(.status == "failed")] | length' result.json)
+          if [ "$failed_tests" -gt 0 ]; then
+            echo "Some tests failed"
             echo "failed=true" >> $GITHUB_ENV
+          else
+            echo "All tests passed"
+            echo "failed=false" >> $GITHUB_ENV
           fi
 
-      # Set GitHub status to failure
+      # Set GitHub status to failure if any tests failed
       - name: Set GitHub status to failure
-        if: ${{ env.failed == 'true' }}  
+        if: ${{ env.failed == 'true' }}  # Check the failure status from environment variable
         run: |
           echo "Tests failed, setting GitHub status to failure"
           curl -X POST \
@@ -102,9 +106,9 @@ jobs:
             -d '{"state":"failure", "context":"Playwright Tests", "description":"Some tests failed"}' \
             "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
 
-      # Set GitHub status to success
+      # Set GitHub status to success if all tests passed
       - name: Set GitHub status to success
-        if: ${{ env.failed == 'false' }}  
+        if: ${{ env.failed == 'false' }}  # Check the success status from environment variable
         run: |
           echo "Tests passed, setting GitHub status to success"
           curl -X POST \

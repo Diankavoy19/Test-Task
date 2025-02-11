@@ -1,6 +1,8 @@
 name: Playwright Tests
 
 on:
+  push:
+    branches: [ main]
   workflow_dispatch:
     inputs:
       margin_issue:
